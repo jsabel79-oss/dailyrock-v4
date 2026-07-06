@@ -2,6 +2,9 @@ const START_MINUTES = 7 * 60;
 const END_MINUTES = 17 * 60;
 const SLOT_MINUTES = 5;
 const PX_PER_MINUTE = 2;
+const DEFAULT_TILE_DURATION = 30;
+const MIN_TILE_DURATION = 10;
+const MAX_TILE_DURATION = 60;
 
 const categories = [
   { name: 'Health', color: '#2f80ed', activities: ['Walk', 'Swim', 'Stretch'] },
@@ -137,13 +140,17 @@ timeline.addEventListener('drop', (event) => {
   const rect = timeline.getBoundingClientRect();
   const y = event.clientY - rect.top;
   const snappedMinutes = Math.round(y / (SLOT_MINUTES * PX_PER_MINUTE)) * SLOT_MINUTES;
-  const start = Math.min(END_MINUTES - 10, Math.max(START_MINUTES, START_MINUTES + snappedMinutes));
-  placedTiles.push({ id: crypto.randomUUID(), name: payload.activity, category: payload.category, color: payload.color, start, duration: 30 });
+  const start = Math.min(END_MINUTES - DEFAULT_TILE_DURATION, Math.max(START_MINUTES, START_MINUTES + snappedMinutes));
+  placedTiles.push({ id: crypto.randomUUID(), name: payload.activity, category: payload.category, color: payload.color, start, duration: DEFAULT_TILE_DURATION });
   renderPlacedTiles();
 });
 
 function changeDuration(delta) {
-  placedTiles = placedTiles.map((tile) => tile.id === activeTileId ? { ...tile, duration: Math.max(10, Math.min(60, tile.duration + delta)) } : tile);
+  placedTiles = placedTiles.map((tile) => {
+    if (tile.id !== activeTileId) return tile;
+    const maxDurationForSlot = Math.min(MAX_TILE_DURATION, END_MINUTES - tile.start);
+    return { ...tile, duration: Math.max(MIN_TILE_DURATION, Math.min(maxDurationForSlot, tile.duration + delta)) };
+  });
   renderPlacedTiles();
 }
 

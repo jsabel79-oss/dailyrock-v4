@@ -97,6 +97,7 @@ button { font: inherit; }
 }
 
 .five-minute-drops {
+  height: 100%;
   background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 9px, rgba(148, 163, 184, 0.05) 9px, rgba(148, 163, 184, 0.05) 10px);
 }
 
