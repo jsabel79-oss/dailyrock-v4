@@ -3,14 +3,11 @@ import { constants } from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const requiredFiles = ['index.html', 'src/main.js', 'src/styles.css'];
-const html = await readFile(path.join(root, 'index.html'), 'utf8');
-const referencedAssets = [...html.matchAll(/(?:href|src)="\/([^"]+)"/g)].map((match) => match[1]);
-
+const requiredFiles = ['App.js', 'app.json', 'babel.config.js', 'package.json'];
 const failures = [];
 
 await Promise.all(
-  [...requiredFiles, ...referencedAssets].map(async (filePath) => {
+  requiredFiles.map(async (filePath) => {
     try {
       await access(path.join(root, filePath), constants.R_OK);
     } catch {
@@ -19,12 +16,14 @@ await Promise.all(
   }),
 );
 
-if (!html.includes('<main class="app">')) {
-  failures.push('index.html must include the app shell.');
-}
+const appSource = await readFile(path.join(root, 'App.js'), 'utf8');
+const packageSource = await readFile(path.join(root, 'package.json'), 'utf8');
 
-if (!html.includes('id="timeline"')) {
-  failures.push('index.html must include the timeline mount point.');
+for (const expectedText of ['Daily Rock', 'ghostSchedule', 'categories', 'PanResponder', 'expo start']) {
+  const source = expectedText === 'expo start' ? packageSource : appSource;
+  if (!source.includes(expectedText)) {
+    failures.push(`Expected Expo app source to include: ${expectedText}`);
+  }
 }
 
 if (failures.length > 0) {
@@ -32,4 +31,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('Repository state validation passed.');
+console.log('Expo application validation passed.');
