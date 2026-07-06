@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Daily Rock",
+    "slug": "dailyrock-v4",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "web": {
+      "bundler": "metro"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#07090d"
+      }
+    }
+  }
+}
